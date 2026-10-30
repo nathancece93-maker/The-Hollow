@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE HOLLOW</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  overflow: hidden;
+  background: #050807;
+  font-family: Arial, sans-serif;
+}
+canvas { display: block; }
+#title {
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  text-align: center;
+  color: #d5dddd;
+  letter-spacing: 9px;
+  font-size: 30px;
+  text-shadow: 0 0 15px #8b0000;
+  pointer-events: none;
+}
+#info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  font-size: 14px;
+  background: #0009;
+  padding: 12px;
+}
+</style>
+</head>
+<body>
+
+<div id="title">THE HOLLOW</div>
+<div id="info">FOREST // NIGHT<br>Loading...</div>
+
+<script type="module">
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050a09);
+scene.fog = new THREE.FogExp2(0x07100e, 0.025);
+
+const camera = new THREE.PerspectiveCamera(
+  75, window.innerWidth / window.innerHeight, 0.1, 500
+);
+camera.position.set(0, 2, 8);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0x71858a, 0x10150e, 1));
+
+const moon = new THREE.DirectionalLight(0x9ba9bb, 1.1);
+moon.position.set(-10, 20, 10);
+scene.add(moon);
+
+// Forest ground
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(300, 300),
+  new THREE.MeshStandardMaterial({ color: 0x172019 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.1;
+scene.add(ground);
+
+// Trees
+const bark = new THREE.MeshStandardMaterial({ color: 0x30251d });
+const leaves = new THREE.MeshStandardMaterial({ color: 0x10251b });
+
+for (let i = 0; i < 180; i++) {
+  const x = (Math.random() - 0.5) * 100;
+  const z = (Math.random() - 0.5) * 100;
+
+  if (Math.abs(x) < 4 && Math.abs(z) < 12) continue;
+
+  const height = 5 + Math.random() * 5;
+
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.25, 0.45, height, 7),
+    bark
+  );
+  trunk.position.set(x, height / 2, z);
+  scene.add(trunk);
+
+  const crown = new THREE.Mesh(
+    new THREE.ConeGeometry(2 + Math.random(), height * 0.55, 7),
+    leaves
+  );
+  crown.position.set(x, height * 0.85, z);
+  scene.add(crown);
+}
+
+// Ground mist
+const mist = new THREE.PointLight(0x30443a, 1, 30);
+mist.position.set(0, 2, -8);
+scene.add(mist);
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.getElementById('info').innerHTML =
+  'FOREST // NIGHT<br>Something is out there...';
+
+</script>
+</body>
+</html>
